@@ -10,3 +10,4 @@ RUN npm install
 EXPOSE 5200
 # start app
 CMD ["npm", "run", "serve"]
+# coomit
