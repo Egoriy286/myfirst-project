@@ -71,7 +71,7 @@ import { API_BASE_URL } from '../config';
         formData.append("file", chunk, this.file.name);
 
         try {
-          const response = await fetch("http://localhost:8000/upload/", {
+          const response = await fetch(`${API_BASE_URL}/upload/`, {
             method: "POST",
             body: formData,
             headers: {
