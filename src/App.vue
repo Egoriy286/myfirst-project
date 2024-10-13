@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { ref }  from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
+const links = [
+        { name: 'Главная', path: '/' },
+        { name: 'Хранилище', path: '/storage' },
+        { name: 'О себе', path: '/about' },
+        { name: 'Контакты', path: '/contact' },
+        { name: 'Тест', path: '/test' },
+      ]
 const isMenuOpen = ref(false);
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -22,13 +29,13 @@ const closeMenu = () => {
       </button>
       <div class="nav-bar" :class="{ 'open': isMenuOpen }">
         <button class="close-button" @click="closeMenu">✖</button>
-        <nav>
-          <RouterLink class="btn btn-header ml-4" @click="closeMenu" to="/">Главная</RouterLink>
+        <nav class="nav-list">
+          <li v-for="(link, index) in links" :key="index">
+            <RouterLink class="btn btn-header ml-4" @click="closeMenu" :to="link.path">{{ link.name }}</RouterLink>
+          </li>
+          <li>
           <a href="https://reg.proste20.ru" class="btn btn-header ml-4">Таблица</a>
-          <RouterLink class="btn btn-header ml-4" @click="closeMenu" to="/storage">Хранилище</RouterLink>
-          <RouterLink class="btn btn-header ml-4" @click="closeMenu" to="/about">О себе</RouterLink>
-          <RouterLink class="btn btn-header ml-4" @click="closeMenu" to="/contact">Контакты</RouterLink>
-          <RouterLink class="btn btn-header ml-4" @click="closeMenu" to="/test">Тест</RouterLink>
+          </li>
         </nav>
       </div>
     </div>
@@ -59,6 +66,11 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%; /* Занимает всю высоту */
+}
+.nav-list {
+  list-style-type: none; /* Убирает маркеры у списка */
+  padding: 0;           /* Убирает отступы */
+  margin: 0;            /* Убирает внешние отступы */
 }
 
 .content {
@@ -113,6 +125,7 @@ html, body {
   display: flex;
   align-items: center;
 }
+
 .nav-bar nav {
   display: flex;
 }
