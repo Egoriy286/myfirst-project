@@ -1,15 +1,16 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
-  </div>
-</template>
-
-<style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
-}
-</style>
+    <div>
+      <h2>О себе</h2>
+      <p>Здесь можно написать о себе, своих навыках и опыте работы.</p>
+    </div>
+  </template>
+  
+  <script>
+  export default {
+    name: "About",
+  };
+  </script>
+  
+  <style scoped>
+  /* Стили для страницы "О себе" */
+  </style>

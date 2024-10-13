@@ -5,10 +5,12 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <template>
   <header>
-    <div class="wrapper">
+    <div class="wrapper m-4">
       <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <RouterLink class="badge badge-lg ml-4" to="/">Главная</RouterLink>
+        <RouterLink class="badge badge-lg ml-4" to="/storage">Хранилище</RouterLink>
+        <RouterLink class="badge badge-lg ml-4" to="/about">О себе</RouterLink>
+        <RouterLink class="badge badge-lg ml-4" to="/test">Тест</RouterLink>
       </nav>
     </div>
   </header>
