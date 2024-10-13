@@ -1,12 +1,14 @@
 <template>
   
   <div class="tools">
+    <div>
   <button @click="deleteSelectedFiles" :disabled="selectedFiles.length === 0" class="delete-button">
       <img src="../assets/trash.png" alt="Delete Selected"/>
   </button> <!-- Delete button -->
   <button @click="downloadSelectedFiles" class="download-button">
     <img src="../assets/download.png" alt="Download Selected"/>
   </button>
+</div>
   
   <input type="file" @change="handleFileChange" class="custom-file-input" />
 
@@ -219,11 +221,13 @@ export default {
 </script>
 
 <style scoped>
+
+
 .grid-container {
-display: grid; /* Enable grid layout */
-grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Create responsive grid */
-gap: 10px; /* Space between cards */
-justify-items: center; /* Center items in each grid cell */
+display: grid; 
+grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+gap: 10px; 
+justify-items: center;
 }
 button{
 height: 40px;
@@ -324,4 +328,34 @@ transform: scale(0.98);
 .tools{
 display: flex; /* Use flex layout for horizontal alignment */
 }
+
+
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .tools {
+    flex-direction: column; /* Stack buttons on smaller screens */
+    align-items: center; /* Center items */
+  }
+  
+  .custom-file-input {
+    width: 90%; /* More width on smaller screens */
+  }
+
+  .grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Smaller cards on mobile */
+  }
+
+  .delete-button img,
+  .download-button img {
+    width: 20px; /* Smaller icons on mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .upload-button {
+    font-size: 14px; /* Smaller text for mobile */
+  }
+}
+
 </style>
