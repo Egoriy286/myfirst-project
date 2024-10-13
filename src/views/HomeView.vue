@@ -97,7 +97,7 @@ export default {
     },
       async fetchFiles() {
         try {
-          const response = await fetch(`${API_BASE_URL}/files`);
+          const response = await fetch(`${API_BASE_URL}/s3files`);
           if (!response.ok) {
             throw new Error('Error fetching files');
           }
@@ -107,7 +107,7 @@ export default {
           console.error('Error fetching files:', error);
         }
         try {
-            const response = await fetch(`${API_BASE_URL}/fileslocal`);
+            const response = await fetch(`${API_BASE_URL}/files`);
             this.filesupload = await response.json();
         } catch (error) {
             console.error("Error fetching filesupload:", error);
@@ -115,7 +115,7 @@ export default {
       },
       async downloadFileS3(filename) {
         try {
-          const response = await fetch(`${API_BASE_URL}/downloads3/${filename}`);
+          const response = await fetch(`${API_BASE_URL}/s3download/${filename}`);
           if (!response.ok) {
             throw new Error('Error downloading file');
           }
@@ -154,7 +154,7 @@ export default {
       async deleteFileS3(filename) {
         if (confirm(`Are you sure you want to delete ${filename}?`)) {
           try {
-            const response = await fetch(`${API_BASE_URL}/deletes3/${filename}`, {
+            const response = await fetch(`${API_BASE_URL}/s3delete/${filename}`, {
               method: 'DELETE',
             });
             if (!response.ok) {
