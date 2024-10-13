@@ -24,17 +24,73 @@ const closeMenu = () => {
         <button class="close-button" @click="closeMenu">✖</button>
         <nav>
           <RouterLink class="btn btn-header ml-4" @click="closeMenu" to="/">Главная</RouterLink>
+          <a href="https://reg.proste20.ru" class="btn btn-header ml-4">Таблица</a>
           <RouterLink class="btn btn-header ml-4" @click="closeMenu" to="/storage">Хранилище</RouterLink>
           <RouterLink class="btn btn-header ml-4" @click="closeMenu" to="/about">О себе</RouterLink>
+          <RouterLink class="btn btn-header ml-4" @click="closeMenu" to="/contact">Контакты</RouterLink>
           <RouterLink class="btn btn-header ml-4" @click="closeMenu" to="/test">Тест</RouterLink>
         </nav>
       </div>
     </div>
-  </header>
+  </header> 
 
-  <RouterView />
+  <div class="content">
+    <RouterView/>
+  </div>
+  
+
+  <div class="footer">
+    <footer class="footer">
+    <p>© 2024 Proste20. Этот сайт на стадии разработки</p>
+    <p>
+          <RouterLink class="btn-header ml-4" @click="closeMenu" to="/">Главная</RouterLink>
+          <RouterLink class="btn-header ml-4" @click="closeMenu" to="/storage">Хранилище</RouterLink>
+          <RouterLink class="btn-header ml-4" @click="closeMenu" to="/about">О себе</RouterLink>
+          <RouterLink class="btn-header ml-4" @click="closeMenu" to="/contact">Контакты</RouterLink>
+          <RouterLink class="btn-header ml-4" @click="closeMenu" to="/test">Тест</RouterLink>
+    </p>
+  </footer>
+  </div>
 </template>
 <style scoped>
+
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* Занимает всю высоту */
+}
+
+.content {
+  display: flex;
+  flex-direction: column; /* Вертикальное размещение элементов */
+  min-height: 100vh; /* Минимальная высота — 100% высоты окна */
+}
+
+.content {
+  flex: 1; /* Занять всё доступное пространство */
+}
+.footer {
+  background-color: #f8f9fa; /* Светлый фон */
+  text-align: center; /* Центрирование текста */
+  padding: 20px; /* Отступы */
+  position: relative; /* Относительное позиционирование */
+  bottom: 0; /* Прикрепить к нижней части страницы */
+  width: 100%; /* Занимает всю ширину */
+}
+
+.footer p {
+  margin: 5px 0; /* Отступы для абзацев */
+}
+
+.footer a {
+  color: #007bff; /* Цвет ссылок */
+  text-decoration: none; /* Убираем подчеркивание */
+}
+
+.footer a:hover {
+  text-decoration: underline; /* Подчеркивание при наведении */
+}
 .wrapper {
   display: flex;
   justify-content: space-between;
@@ -44,6 +100,7 @@ const closeMenu = () => {
 .logo {
   height: 4em;
 }
+
 
 .menu-toggle {
   display: none;
