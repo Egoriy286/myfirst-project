@@ -13,13 +13,22 @@
           ></div>
         </div>
       </div>
+
+      <h2>Uploaded Files local</h2>
+    <ul>
+      <li v-for="file in filesupload" :key="file">
+        <a :href="`${API_BASE_URL}/download/${file}`" target="_blank">{{ file }}</a>
+        <button @click="downloadFile(file)">Download</button>
+        <button @click="deleteFile(file)">Delete</button>
+      </li>
+    </ul>
   
-      <h2>Available Files</h2>
+      <h2>Available Files BucketS3</h2>
       <ul>
         <li v-for="file in files" :key="file.name">
           <span>{{ file.name }} ({{ file.size }} bytes)</span>
-          <button @click="downloadFile(file.name)">Download</button>
-          <button @click="deleteFile(file.name)">Delete</button>
+          <button @click="downloadFileS3(file.name)">Download</button>
+          <button @click="deleteFiles3(file.name)">Delete</button>
         </li>
       </ul>
     </div>
@@ -27,13 +36,14 @@
   
   <script>
 import { API_BASE_URL } from '../config';
-
-  export default {
+import axios from 'axios';
+export default {
     data() {
       return {
-        selectedFile: null,
         file: null,
         files: [],
+        filesupload: [],
+        totalChunks: 0,
         uploading: true,
         uploadProgress: 0,
       };
@@ -43,55 +53,47 @@ import { API_BASE_URL } from '../config';
             this.file = event.target.files[0];
         },
       async uploadFile() {
-      if (!this.file) {
-        alert("Пожалуйста, выберите файл.");
+        if (!this.file) {
+        alert("Please select a file to upload.");
         return;
       }
 
-      const CHUNK_SIZE = 1024 * 1024; // 1 MB
-      const totalChunks = Math.ceil(this.file.size / CHUNK_SIZE);
+      const formData = new FormData();
+      formData.append("file", this.file);
 
-      let uploadedChunks = 0;
+      // Use XMLHttpRequest to track the upload progress
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `${API_BASE_URL}/upload/`, true);
 
-      // Получаем текущий статус загрузки
-      try {
-        const statusResponse = await fetch(`${API_BASE_URL}/upload-status/${this.file.name}`);
-        const statusData = await statusResponse.json();
-        uploadedChunks = statusData.uploaded_chunks || 0;
-      } catch (error) {
-        console.error("Ошибка при получении статуса загрузки:", error);
-      }
-
-      for (let i = uploadedChunks; i < totalChunks; i++) {
-        const start = i * CHUNK_SIZE;
-        const end = Math.min(start + CHUNK_SIZE, this.file.size);
-        const chunk = this.file.slice(start, end);
-        
-        const formData = new FormData();
-        formData.append("file", chunk, this.file.name);
-
-        try {
-          const response = await fetch(`${API_BASE_URL}/upload/`, {
-            method: "POST",
-            body: formData,
-            headers: {
-              "chunk-number": i,
-              "total-chunks": totalChunks,
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error(`Ошибка загрузки файла: ${response.statusText}`);
-          }
-
-          console.log(`Часть ${i + 1} из ${totalChunks} загружена`);
-        } catch (error) {
-          console.error("Ошибка загрузки файла:", error);
-          break; // Завершение при ошибке
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          // Calculate the percentage completed
+          this.uploadProgress = Math.round((event.loaded / event.total) * 100);
         }
-      }
+      };
 
-      alert("Файл загружен успешно!");
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const result = JSON.parse(xhr.responseText);
+          this.message = result.info;
+          this.uploadProgress = 0; // Reset the progress bar
+          this.fetchFiles(); // Refresh the file list
+        } else {
+          console.error("Error uploading file:", xhr.responseText);
+          this.message = "Error uploading file.";
+          this.uploadProgress = 0;
+        }
+      };
+
+      xhr.onerror = () => {
+        console.error("Error uploading file.");
+        this.message = "Error uploading file.";
+        this.uploadProgress = 0;
+      };
+
+      // Send the form data
+      xhr.send(formData);
+      this.fetchFiles();
     },
       async fetchFiles() {
         try {
@@ -104,14 +106,19 @@ import { API_BASE_URL } from '../config';
         } catch (error) {
           console.error('Error fetching files:', error);
         }
-      },
-      async downloadFile(filename) {
         try {
-          const response = await fetch(`${API_BASE_URL}/download/${filename}`);
+            const response = await fetch(`${API_BASE_URL}/fileslocal`);
+            this.filesupload = await response.json();
+        } catch (error) {
+            console.error("Error fetching filesupload:", error);
+        }
+      },
+      async downloadFileS3(filename) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/downloads3/${filename}`);
           if (!response.ok) {
             throw new Error('Error downloading file');
           }
-  
           const blob = await response.blob();
           const url = window.URL.createObjectURL(blob);
           const link = document.createElement('a');
@@ -122,6 +129,44 @@ import { API_BASE_URL } from '../config';
           document.body.removeChild(link);
         } catch (error) {
           console.error('Error downloading file:', error);
+        }
+      },
+      async downloadFile(filename) {
+        try {
+            console.log(filename)
+          const response = await fetch(`${API_BASE_URL}/download/${filename}`);
+          if (!response.ok) {
+            throw new Error('Error downloading file');
+          }
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', filename);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } catch (error) {
+          console.error('Error downloading file:', error);
+        }
+      },
+
+      async deleteFileS3(filename) {
+        if (confirm(`Are you sure you want to delete ${filename}?`)) {
+          try {
+            const response = await fetch(`${API_BASE_URL}/deletes3/${filename}`, {
+              method: 'DELETE',
+            });
+            if (!response.ok) {
+              throw new Error('Error deleting file');
+            }
+  
+            alert('File deleted successfully');
+            this.fetchFiles(); // Refresh the list of files
+          } catch (error) {
+            console.error('Error deleting file:', error);
+            alert('Error deleting file');
+          }
         }
       },
       async deleteFile(filename) {
