@@ -1,7 +1,7 @@
 <template>
     <div>
       <h1>File Uploader</h1>
-      <input type="file" @change="onFileChange" />
+      <input type="file" @change="handleFileUpload" />
       <button @click="uploadFile">Upload</button>
   
       <div>
@@ -32,15 +32,15 @@ import { API_BASE_URL } from '../config';
     data() {
       return {
         selectedFile: null,
-        files: [],
+        file: null,
         uploading: true,
         uploadProgress: 0,
       };
     },
     methods: {
-      onFileChange(event) {
-        this.selectedFile = event.target.files[0];
-      },
+        handleFileUpload(event) {
+            this.file = event.target.files[0];
+        },
       async uploadFile() {
       if (!this.file) {
         alert("Пожалуйста, выберите файл.");
