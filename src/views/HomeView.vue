@@ -42,46 +42,56 @@ import { API_BASE_URL } from '../config';
         this.selectedFile = event.target.files[0];
       },
       async uploadFile() {
-  if (!this.selectedFile) return;
-
-  const formData = new FormData();
-  formData.append('file', this.selectedFile);
-
-  this.uploading = true;
-  this.uploadProgress = 0;
-
-  try {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${API_BASE_URL}/upload/`, true);
-
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        this.uploadProgress = Math.round((event.loaded * 100) / event.total);
+      if (!this.file) {
+        alert("Пожалуйста, выберите файл.");
+        return;
       }
-    };
 
-    xhr.onload = () => {
-      if (xhr.status === 200) {
-        alert('File uploaded successfully');
-        this.fetchFiles(); // Refresh the list of files
-      } else {
-        throw new Error('Error uploading file');
+      const CHUNK_SIZE = 1024 * 1024; // 1 MB
+      const totalChunks = Math.ceil(this.file.size / CHUNK_SIZE);
+
+      let uploadedChunks = 0;
+
+      // Получаем текущий статус загрузки
+      try {
+        const statusResponse = await fetch(`${API_BASE_URL}/upload-status/${this.file.name}`);
+        const statusData = await statusResponse.json();
+        uploadedChunks = statusData.uploaded_chunks || 0;
+      } catch (error) {
+        console.error("Ошибка при получении статуса загрузки:", error);
       }
-    };
 
-    xhr.onerror = () => {
-      alert('Error uploading file');
-    };
+      for (let i = uploadedChunks; i < totalChunks; i++) {
+        const start = i * CHUNK_SIZE;
+        const end = Math.min(start + CHUNK_SIZE, this.file.size);
+        const chunk = this.file.slice(start, end);
+        
+        const formData = new FormData();
+        formData.append("file", chunk, this.file.name);
 
-    xhr.send(formData);
-  } catch (error) {
-    console.error('Error uploading file:', error);
-    alert('Error uploading file');
-  } finally {
-    this.uploading = false; // Завершаем индикатор загрузки
-    this.uploadProgress = 0; // Сбрасываем прогресс
-  }
-},
+        try {
+          const response = await fetch("http://localhost:8000/upload/", {
+            method: "POST",
+            body: formData,
+            headers: {
+              "chunk-number": i,
+              "total-chunks": totalChunks,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`Ошибка загрузки файла: ${response.statusText}`);
+          }
+
+          console.log(`Часть ${i + 1} из ${totalChunks} загружена`);
+        } catch (error) {
+          console.error("Ошибка загрузки файла:", error);
+          break; // Завершение при ошибке
+        }
+      }
+
+      alert("Файл загружен успешно!");
+    },
       async fetchFiles() {
         try {
           const response = await fetch(`${API_BASE_URL}/files`);
