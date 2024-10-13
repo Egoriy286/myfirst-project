@@ -1,5 +1,5 @@
 # base image
-FROM node:20.17.0-alpine3.20
+FROM node:20.17.0
 
 # set working directory
 WORKDIR /app
@@ -8,6 +8,5 @@ COPY . .
 RUN npm install
 
 EXPOSE 5200
-# start app
+
 CMD ["npm", "run", "serve"]
-# coomit
