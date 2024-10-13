@@ -33,6 +33,7 @@ import { API_BASE_URL } from '../config';
       return {
         selectedFile: null,
         file: null,
+        files: [],
         uploading: true,
         uploadProgress: 0,
       };
