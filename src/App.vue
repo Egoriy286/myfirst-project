@@ -33,9 +33,7 @@ const closeMenu = () => {
           <li v-for="(link, index) in links" :key="index">
             <RouterLink class="btn btn-header ml-4" @click="closeMenu" :to="link.path">{{ link.name }}</RouterLink>
           </li>
-          <li>
-          <a href="https://reg.proste20.ru" class="btn btn-header ml-4">Таблица</a>
-          </li>
+          
         </nav>
       </div>
     </div>
