@@ -35,7 +35,7 @@ export default defineComponent({
       } else if (sizeInBytes < 1024 ** 3) {
         return `${(sizeInBytes / (1024 ** 2)).toFixed(2)} MB`; // Format to 2 decimal places
       } else {
-        return `${(sizeInBytes / (1024 ** 3)).toFixed(2)} MB`;
+        return `${(sizeInBytes / (1024 ** 3)).toFixed(2)} GB`;
       }
     },
     
